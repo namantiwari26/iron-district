@@ -1,8 +1,10 @@
 import { useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Check, ArrowUpRight } from "lucide-react";
 import { pricingPlans } from "../data/content";
+import TiltCard from "./TiltCard";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -24,7 +26,7 @@ export default function Pricing() {
             ease: "power3.out",
           });
 
-          const cards = sectionRef.current.querySelectorAll(".pricing-card");
+          const cards = sectionRef.current.querySelectorAll(".pricing-card-wrap");
           gsap.set(cards, { opacity: 0, y: 50 });
           gsap.to(cards, {
             opacity: 1,
@@ -52,7 +54,7 @@ export default function Pricing() {
       }}
       aria-labelledby="pricing-heading"
     >
-      {/* Subtle red glow top */}
+      {/* Subtle red glow line */}
       <div
         style={{
           position: "absolute",
@@ -62,14 +64,17 @@ export default function Pricing() {
           width: "600px",
           height: "1px",
           background: "linear-gradient(to right, transparent, #D62020, transparent)",
-          opacity: 0.5,
+          opacity: 0.6,
         }}
         aria-hidden="true"
       />
 
       <div style={{ maxWidth: "1440px", margin: "0 auto" }}>
         {/* Header */}
-        <div ref={headingRef} style={{ textAlign: "center", marginBottom: "clamp(3rem, 6vw, 5rem)" }}>
+        <div
+          ref={headingRef}
+          style={{ textAlign: "center", marginBottom: "clamp(3rem, 6vw, 5rem)" }}
+        >
           <p
             style={{
               fontFamily: "'Oswald', sans-serif",
@@ -92,12 +97,11 @@ export default function Pricing() {
               lineHeight: 0.95,
             }}
           >
-            INVEST IN YOUR{" "}
-            <span style={{ color: "#D62020" }}>BEST SELF</span>
+            INVEST IN YOUR <span style={{ color: "#D62020" }}>BEST SELF</span>
           </h2>
         </div>
 
-        {/* Plans grid */}
+        {/* Plans Grid */}
         <div
           style={{
             display: "grid",
@@ -107,186 +111,176 @@ export default function Pricing() {
           className="pricing-grid"
         >
           {pricingPlans.map((plan) => (
-            <div
-              key={plan.id}
-              className="pricing-card"
-              style={{
-                background: plan.featured ? "#1A1A1A" : "#0A0A0A",
-                border: plan.featured
-                  ? "1px solid #D62020"
-                  : "1px solid rgba(255,255,255,0.08)",
-                borderRadius: "4px",
-                padding: "2.5rem 2rem",
-                position: "relative",
-                overflow: "hidden",
-                transition: "transform 0.3s, box-shadow 0.3s",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "translateY(-6px)";
-                e.currentTarget.style.boxShadow = plan.featured
-                  ? "0 20px 60px rgba(214,32,32,0.2)"
-                  : "0 20px 60px rgba(0,0,0,0.3)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "";
-                e.currentTarget.style.boxShadow = "none";
-              }}
-            >
-              {/* Badge */}
-              {plan.badge && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "1.25rem",
-                    right: "1.25rem",
-                    background: "#D62020",
-                    padding: "0.25rem 0.75rem",
-                    borderRadius: "2px",
-                    fontFamily: "'Oswald', sans-serif",
-                    fontSize: "0.6rem",
-                    letterSpacing: "0.2em",
-                    color: "#EDEDED",
-                  }}
-                >
-                  {plan.badge}
-                </div>
-              )}
-
-              {/* Plan name */}
-              <p
+            <div key={plan.id} className="pricing-card-wrap">
+              <TiltCard
                 style={{
-                  fontFamily: "'Oswald', sans-serif",
-                  fontSize: "0.75rem",
-                  letterSpacing: "0.25em",
-                  color: plan.featured ? "#D62020" : "#8A8A8A",
-                  marginBottom: "0.75rem",
-                }}
-              >
-                {plan.name}
-              </p>
-
-              {/* Price */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "baseline",
-                  gap: "0.25rem",
-                  marginBottom: "0.75rem",
-                }}
-              >
-                <span
-                  style={{
-                    fontFamily: "'Bebas Neue', sans-serif",
-                    fontSize: "clamp(3rem, 5vw, 4rem)",
-                    color: "#EDEDED",
-                    lineHeight: 1,
-                  }}
-                >
-                  ${plan.price}
-                </span>
-                <span
-                  style={{
-                    fontFamily: "'Inter', sans-serif",
-                    fontSize: "0.9rem",
-                    color: "#8A8A8A",
-                  }}
-                >
-                  {plan.period}
-                </span>
-              </div>
-
-              {/* Description */}
-              <p
-                style={{
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: "0.85rem",
-                  color: "#8A8A8A",
-                  lineHeight: 1.6,
-                  marginBottom: "2rem",
-                  paddingBottom: "2rem",
-                  borderBottom: "1px solid rgba(255,255,255,0.08)",
-                }}
-              >
-                {plan.description}
-              </p>
-
-              {/* Features */}
-              <ul
-                style={{
-                  listStyle: "none",
+                  background: plan.featured ? "#1A1A1A" : "#0A0A0A",
+                  border: plan.featured
+                    ? "2px solid #D62020"
+                    : "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: "4px",
+                  padding: "2.5rem 2rem",
                   display: "flex",
                   flexDirection: "column",
-                  gap: "0.85rem",
-                  marginBottom: "2.5rem",
+                  justifyContent: "space-between",
+                  height: "100%",
                 }}
               >
-                {plan.features.map((f, i) => (
-                  <li
-                    key={i}
+                <div>
+                  {/* Badge */}
+                  {plan.badge && (
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "1.25rem",
+                        right: "1.25rem",
+                        background: "#D62020",
+                        padding: "0.25rem 0.75rem",
+                        borderRadius: "2px",
+                        fontFamily: "'Oswald', sans-serif",
+                        fontSize: "0.6rem",
+                        letterSpacing: "0.2em",
+                        color: "#EDEDED",
+                      }}
+                    >
+                      {plan.badge}
+                    </div>
+                  )}
+
+                  {/* Plan Name */}
+                  <p
                     style={{
-                      display: "flex",
-                      alignItems: "flex-start",
-                      gap: "0.75rem",
-                      fontFamily: "'Inter', sans-serif",
-                      fontSize: "0.85rem",
-                      color: "#EDEDED",
-                      lineHeight: 1.5,
+                      fontFamily: "'Oswald', sans-serif",
+                      fontSize: "0.75rem",
+                      letterSpacing: "0.25em",
+                      color: plan.featured ? "#D62020" : "#8A8A8A",
+                      marginBottom: "0.75rem",
                     }}
                   >
-                    <Check
-                      size={14}
-                      style={{
-                        color: "#D62020",
-                        flexShrink: 0,
-                        marginTop: "2px",
-                      }}
-                    />
-                    {f}
-                  </li>
-                ))}
-              </ul>
+                    {plan.name}
+                  </p>
 
-              {/* CTA */}
-              <a
-                href="#contact"
-                onClick={(e) => e.preventDefault()}
-                style={{
-                  fontFamily: "'Oswald', sans-serif",
-                  fontSize: "0.8rem",
-                  letterSpacing: "0.18em",
-                  color: plan.featured ? "#EDEDED" : "#EDEDED",
-                  background: plan.featured ? "#D62020" : "transparent",
-                  border: plan.featured
-                    ? "1px solid #D62020"
-                    : "1px solid rgba(255,255,255,0.3)",
-                  padding: "0.85rem",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "0.5rem",
-                  textDecoration: "none",
-                  borderRadius: "2px",
-                  width: "100%",
-                  transition: "background 0.3s, border-color 0.3s",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = plan.featured
-                    ? "#FF2D2D"
-                    : "rgba(214,32,32,0.1)";
-                  e.currentTarget.style.borderColor = "#D62020";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = plan.featured
-                    ? "#D62020"
-                    : "transparent";
-                  e.currentTarget.style.borderColor = plan.featured
-                    ? "#D62020"
-                    : "rgba(255,255,255,0.3)";
-                }}
-              >
-                {plan.cta}
-                <ArrowUpRight size={14} />
-              </a>
+                  {/* Price */}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "baseline",
+                      gap: "0.25rem",
+                      marginBottom: "0.75rem",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: "'Bebas Neue', sans-serif",
+                        fontSize: "clamp(3rem, 5vw, 4rem)",
+                        color: "#EDEDED",
+                        lineHeight: 1,
+                      }}
+                    >
+                      ${plan.monthlyPrice}
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: "'Inter', sans-serif",
+                        fontSize: "0.9rem",
+                        color: "#8A8A8A",
+                      }}
+                    >
+                      {plan.period}
+                    </span>
+                  </div>
+
+                  {/* Description */}
+                  <p
+                    style={{
+                      fontFamily: "'Inter', sans-serif",
+                      fontSize: "0.85rem",
+                      color: "#8A8A8A",
+                      lineHeight: 1.6,
+                      marginBottom: "2rem",
+                      paddingBottom: "2rem",
+                      borderBottom: "1px solid rgba(255,255,255,0.08)",
+                    }}
+                  >
+                    {plan.description}
+                  </p>
+
+                  {/* Features */}
+                  <ul
+                    style={{
+                      listStyle: "none",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "0.85rem",
+                      marginBottom: "2.5rem",
+                    }}
+                  >
+                    {plan.features.slice(0, 5).map((f, i) => (
+                      <li
+                        key={i}
+                        style={{
+                          display: "flex",
+                          alignItems: "flex-start",
+                          gap: "0.75rem",
+                          fontFamily: "'Inter', sans-serif",
+                          fontSize: "0.85rem",
+                          color: "#EDEDED",
+                          lineHeight: 1.5,
+                        }}
+                      >
+                        <Check
+                          size={14}
+                          style={{
+                            color: "#D62020",
+                            flexShrink: 0,
+                            marginTop: "2px",
+                          }}
+                        />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* CTA Link */}
+                <Link
+                  to="/pricing"
+                  style={{
+                    fontFamily: "'Oswald', sans-serif",
+                    fontSize: "0.8rem",
+                    letterSpacing: "0.18em",
+                    color: "#EDEDED",
+                    background: plan.featured ? "#D62020" : "transparent",
+                    border: plan.featured
+                      ? "1px solid #D62020"
+                      : "1px solid rgba(255,255,255,0.3)",
+                    padding: "0.85rem",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "0.5rem",
+                    textDecoration: "none",
+                    borderRadius: "2px",
+                    width: "100%",
+                    transition: "background 0.3s, border-color 0.3s",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "#FF2D2D";
+                    e.currentTarget.style.borderColor = "#FF2D2D";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = plan.featured
+                      ? "#D62020"
+                      : "transparent";
+                    e.currentTarget.style.borderColor = plan.featured
+                      ? "#D62020"
+                      : "rgba(255,255,255,0.3)";
+                  }}
+                >
+                  {plan.cta}
+                  <ArrowUpRight size={14} />
+                </Link>
+              </TiltCard>
             </div>
           ))}
         </div>
@@ -303,4 +297,3 @@ export default function Pricing() {
     </section>
   );
 }
-

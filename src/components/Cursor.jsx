@@ -4,12 +4,11 @@ export default function Cursor() {
   const dotRef = useRef(null);
   const ringRef = useRef(null);
   const [label, setLabel] = useState("");
-  const pos = useRef({ x: 0, y: 0 });
-  const ring = useRef({ x: 0, y: 0 });
+  const pos = useRef({ x: -100, y: -100 });
+  const ring = useRef({ x: -100, y: -100 });
   const rafId = useRef(null);
 
   useEffect(() => {
-    // Check pointer device
     if (window.matchMedia("(hover: none)").matches) return;
 
     const dot = dotRef.current;
@@ -24,55 +23,58 @@ export default function Cursor() {
     const lerp = (a, b, t) => a + (b - a) * t;
 
     const animate = () => {
-      ring.current.x = lerp(ring.current.x, pos.current.x, 0.12);
-      ring.current.y = lerp(ring.current.y, pos.current.y, 0.12);
+      ring.current.x = lerp(ring.current.x, pos.current.x, 0.14);
+      ring.current.y = lerp(ring.current.y, pos.current.y, 0.14);
       ringEl.style.transform = `translate(${ring.current.x}px, ${ring.current.y}px)`;
       rafId.current = requestAnimationFrame(animate);
     };
     rafId.current = requestAnimationFrame(animate);
 
-    // Interactive elements
-    const addHover = (el) => {
-      el.addEventListener("mouseenter", () => {
-        ringEl.style.width = "60px";
-        ringEl.style.height = "60px";
-        ringEl.style.borderColor = "#D62020";
-        ringEl.style.marginLeft = "-30px";
-        ringEl.style.marginTop = "-30px";
-        const viewLabel = el.closest("[data-cursor]")?.dataset.cursor;
-        if (viewLabel) setLabel(viewLabel);
-      });
-      el.addEventListener("mouseleave", () => {
+    const handlePointerOver = (e) => {
+      const target = e.target.closest("a, button, [role='button'], input, select, textarea, [data-cursor]");
+      if (target) {
+        const cursorData = target.closest("[data-cursor]")?.getAttribute("data-cursor");
+        if (cursorData) {
+          setLabel(cursorData);
+          ringEl.style.width = "64px";
+          ringEl.style.height = "64px";
+          ringEl.style.marginLeft = "-32px";
+          ringEl.style.marginTop = "-32px";
+          ringEl.style.borderColor = "#D62020";
+          ringEl.style.background = "rgba(214, 32, 32, 0.15)";
+        } else {
+          setLabel("");
+          ringEl.style.width = "50px";
+          ringEl.style.height = "50px";
+          ringEl.style.marginLeft = "-25px";
+          ringEl.style.marginTop = "-25px";
+          ringEl.style.borderColor = "#D62020";
+          ringEl.style.background = "rgba(214, 32, 32, 0.08)";
+        }
+      } else {
+        setLabel("");
         ringEl.style.width = "36px";
         ringEl.style.height = "36px";
-        ringEl.style.borderColor = "rgba(214,32,32,0.6)";
         ringEl.style.marginLeft = "-18px";
         ringEl.style.marginTop = "-18px";
-        setLabel("");
-      });
+        ringEl.style.borderColor = "rgba(214, 32, 32, 0.6)";
+        ringEl.style.background = "transparent";
+      }
     };
 
-    const interactiveEls = document.querySelectorAll("a, button, [role='button'], .program-card");
-    interactiveEls.forEach(addHover);
-
-    // Observe DOM for new elements
-    const observer = new MutationObserver(() => {
-      document.querySelectorAll("a, button, [role='button'], .program-card").forEach(addHover);
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-
     document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseover", handlePointerOver);
 
     return () => {
       document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseover", handlePointerOver);
       cancelAnimationFrame(rafId.current);
-      observer.disconnect();
     };
   }, []);
 
   return (
     <>
-      {/* Dot */}
+      {/* Central Red Dot */}
       <div
         ref={dotRef}
         aria-hidden="true"
@@ -87,11 +89,11 @@ export default function Cursor() {
           borderRadius: "50%",
           background: "#D62020",
           pointerEvents: "none",
-          zIndex: 99998,
+          zIndex: 100000,
           transform: "translate(-100px, -100px)",
         }}
       />
-      {/* Ring */}
+      {/* Outer Magnetic Ring with Dynamic Context Text */}
       <div
         ref={ringRef}
         aria-hidden="true"
@@ -104,23 +106,25 @@ export default function Cursor() {
           marginLeft: "-18px",
           marginTop: "-18px",
           borderRadius: "50%",
-          border: "1.5px solid rgba(214,32,32,0.6)",
+          border: "1.5px solid rgba(214, 32, 32, 0.6)",
           pointerEvents: "none",
-          zIndex: 99997,
+          zIndex: 99999,
           transform: "translate(-100px, -100px)",
-          transition: "width 0.3s, height 0.3s, margin 0.3s, border-color 0.3s",
+          transition: "width 0.25s ease-out, height 0.25s ease-out, margin 0.25s ease-out, border-color 0.25s, background 0.25s",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          backdropFilter: label ? "blur(2px)" : "none",
         }}
       >
         {label && (
           <span
             style={{
               fontFamily: "'Oswald', sans-serif",
-              fontSize: "8px",
-              letterSpacing: "0.1em",
-              color: "#D62020",
+              fontSize: "9px",
+              letterSpacing: "0.15em",
+              color: "#EDEDED",
+              fontWeight: 600,
               whiteSpace: "nowrap",
             }}
           >
@@ -131,4 +135,3 @@ export default function Cursor() {
     </>
   );
 }
-

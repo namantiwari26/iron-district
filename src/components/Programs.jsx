@@ -1,189 +1,14 @@
 import { useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowUpRight, Dumbbell, Heart, User } from "lucide-react";
 import { programs } from "../data/content";
+import TiltCard from "./TiltCard";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const iconMap = { dumbbell: Dumbbell, heart: Heart, user: User };
-
-function ProgramCard({ program, index }) {
-  const cardRef = useRef(null);
-  const imgRef = useRef(null);
-  const arrowRef = useRef(null);
-
-  useEffect(() => {
-    const card = cardRef.current;
-    if (!card) return;
-
-    // Enter animation
-    gsap.set(card, { opacity: 0, y: 60, rotation: 2 });
-    ScrollTrigger.create({
-      trigger: card,
-      start: "top 85%",
-      onEnter: () => {
-        gsap.to(card, {
-          opacity: 1,
-          y: 0,
-          rotation: 0,
-          duration: 0.8,
-          ease: "power3.out",
-          delay: index * 0.15,
-        });
-      },
-    });
-
-    // Hover effects
-    const onEnter = () => {
-      gsap.to(imgRef.current, { scale: 1.08, duration: 0.6, ease: "power2.out" });
-      gsap.to(arrowRef.current, { x: 4, y: -4, duration: 0.3 });
-      card.style.boxShadow = "0 0 0 1px #D62020, 0 20px 60px rgba(214,32,32,0.15)";
-      card.style.transform = "translateY(-8px)";
-      card.style.transition = "box-shadow 0.4s, transform 0.4s";
-    };
-
-    const onLeave = () => {
-      gsap.to(imgRef.current, { scale: 1, duration: 0.6, ease: "power2.out" });
-      gsap.to(arrowRef.current, { x: 0, y: 0, duration: 0.3 });
-      card.style.boxShadow = "none";
-      card.style.transform = "";
-    };
-
-    card.addEventListener("mouseenter", onEnter);
-    card.addEventListener("mouseleave", onLeave);
-
-    return () => {
-      card.removeEventListener("mouseenter", onEnter);
-      card.removeEventListener("mouseleave", onLeave);
-    };
-  }, [index]);
-
-  const Icon = iconMap[program.icon] || Dumbbell;
-
-  return (
-    <div
-      ref={cardRef}
-      className="program-card"
-      data-cursor="VIEW"
-      style={{
-        background: "#141414",
-        border: "1px solid rgba(255,255,255,0.08)",
-        borderRadius: "4px",
-        overflow: "hidden",
-        cursor: "none",
-        position: "relative",
-        willChange: "transform",
-      }}
-    >
-      {/* Image */}
-      <div
-        style={{
-          position: "relative",
-          height: "280px",
-          overflow: "hidden",
-        }}
-      >
-        <img
-          ref={imgRef}
-          src={program.image}
-          alt={program.title + " program"}
-          loading="lazy"
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            willChange: "transform",
-            display: "block",
-          }}
-          onError={(e) => {
-            e.currentTarget.style.display = "none";
-            e.currentTarget.parentElement.style.background =
-              `linear-gradient(135deg, #1A1A1A 0%, #0A0A0A 100%)`;
-          }}
-        />
-
-        {/* Gradient overlay */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: "linear-gradient(to top, rgba(10,10,10,0.8) 0%, transparent 60%)",
-          }}
-          aria-hidden="true"
-        />
-
-        {/* Red icon square */}
-        <div
-          style={{
-            position: "absolute",
-            top: "1rem",
-            left: "1rem",
-            width: "36px",
-            height: "36px",
-            background: "#D62020",
-            borderRadius: "2px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          aria-hidden="true"
-        >
-          <Icon size={18} color="#EDEDED" />
-        </div>
-      </div>
-
-      {/* Content */}
-      <div style={{ padding: "1.5rem" }}>
-        <h3
-          style={{
-            fontFamily: "'Bebas Neue', sans-serif",
-            fontSize: "clamp(1.5rem, 3vw, 1.8rem)",
-            letterSpacing: "0.06em",
-            color: "#EDEDED",
-            marginBottom: "0.5rem",
-          }}
-        >
-          {program.title}
-        </h3>
-        <p
-          style={{
-            fontFamily: "'Inter', sans-serif",
-            fontSize: "0.85rem",
-            color: "#8A8A8A",
-            lineHeight: 1.6,
-            marginBottom: "1.5rem",
-          }}
-        >
-          {program.subtitle}
-        </p>
-
-        {/* Arrow */}
-        <div
-          ref={arrowRef}
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-          }}
-        >
-          <div
-            style={{
-              width: "32px",
-              height: "32px",
-              background: "#D62020",
-              borderRadius: "2px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <ArrowUpRight size={16} color="#EDEDED" />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function Programs() {
   const sectionRef = useRef(null);
@@ -191,6 +16,8 @@ export default function Programs() {
   const textRef = useRef(null);
   const btnRef = useRef(null);
   const labelRef = useRef(null);
+
+  const homePrograms = programs.slice(0, 3);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -227,11 +54,12 @@ export default function Programs() {
       style={{
         background: "#0A0A0A",
         padding: "clamp(5rem, 10vw, 9rem) 2rem",
+        position: "relative",
       }}
       aria-labelledby="training-heading"
     >
       <div style={{ maxWidth: "1440px", margin: "0 auto" }}>
-        {/* Two-column layout */}
+        {/* Two-column layout matching screenshot */}
         <div
           style={{
             display: "grid",
@@ -241,7 +69,7 @@ export default function Programs() {
           }}
           className="programs-grid"
         >
-          {/* Left column */}
+          {/* Left Column */}
           <div>
             <p
               ref={labelRef}
@@ -283,18 +111,16 @@ export default function Programs() {
                 lineHeight: 1.75,
                 color: "#8A8A8A",
                 marginBottom: "2.5rem",
-                maxWidth: "320px",
+                maxWidth: "340px",
               }}
             >
-              {/* from brand */}
               World-class equipment, elite coaching and a community that pushes
               you to be your best.
             </p>
 
-            <a
+            <Link
               ref={btnRef}
-              href="#training"
-              onClick={(e) => e.preventDefault()}
+              to="/training"
               style={{
                 fontFamily: "'Oswald', sans-serif",
                 fontSize: "0.78rem",
@@ -322,10 +148,10 @@ export default function Programs() {
             >
               EXPLORE PROGRAMS
               <ArrowUpRight size={14} />
-            </a>
+            </Link>
           </div>
 
-          {/* Right column: cards grid */}
+          {/* Right Column: 3 Program Cards */}
           <div
             style={{
               display: "grid",
@@ -334,9 +160,124 @@ export default function Programs() {
             }}
             className="cards-grid"
           >
-            {programs.map((prog, i) => (
-              <ProgramCard key={prog.id} program={prog} index={i} />
-            ))}
+            {homePrograms.map((prog) => {
+              const Icon = iconMap[prog.icon] || Dumbbell;
+              return (
+                <TiltCard
+                  key={prog.id}
+                  cursorLabel="VIEW"
+                  style={{
+                    background: "#141414",
+                    borderRadius: "4px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Link
+                    to="/training"
+                    style={{ textDecoration: "none", color: "inherit", display: "block" }}
+                  >
+                    {/* Image */}
+                    <div
+                      style={{
+                        position: "relative",
+                        height: "280px",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <img
+                        src={prog.image}
+                        alt={`${prog.title} program`}
+                        loading="lazy"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          display: "block",
+                          transition: "transform 0.5s ease",
+                        }}
+                      />
+
+                      {/* Gradient */}
+                      <div
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          background:
+                            "linear-gradient(to top, #141414 0%, transparent 60%)",
+                        }}
+                        aria-hidden="true"
+                      />
+
+                      {/* Red Icon Square */}
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: "1rem",
+                          left: "1rem",
+                          width: "36px",
+                          height: "36px",
+                          background: "#D62020",
+                          borderRadius: "2px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          color: "#EDEDED",
+                        }}
+                        aria-hidden="true"
+                      >
+                        <Icon size={18} />
+                      </div>
+                    </div>
+
+                    {/* Content */}
+                    <div style={{ padding: "1.5rem" }}>
+                      <h3
+                        style={{
+                          fontFamily: "'Bebas Neue', sans-serif",
+                          fontSize: "clamp(1.5rem, 3vw, 1.8rem)",
+                          letterSpacing: "0.06em",
+                          color: "#EDEDED",
+                          marginBottom: "0.5rem",
+                        }}
+                      >
+                        {prog.title}
+                      </h3>
+                      <p
+                        style={{
+                          fontFamily: "'Inter', sans-serif",
+                          fontSize: "0.85rem",
+                          color: "#8A8A8A",
+                          lineHeight: 1.6,
+                          marginBottom: "1.5rem",
+                        }}
+                      >
+                        {prog.subtitle}
+                      </p>
+
+                      {/* Red Arrow */}
+                      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                        <div
+                          style={{
+                            width: "32px",
+                            height: "32px",
+                            background: "#D62020",
+                            borderRadius: "2px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "#EDEDED",
+                          }}
+                        >
+                          <ArrowUpRight size={16} />
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </TiltCard>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -353,4 +294,3 @@ export default function Programs() {
     </section>
   );
 }
-

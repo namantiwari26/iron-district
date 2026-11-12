@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowUpRight, Play } from "lucide-react";
@@ -12,7 +13,6 @@ gsap.registerPlugin(ScrollTrigger);
 export default function Hero({ onWatchVideo }) {
   const sectionRef = useRef(null);
   const bgRef = useRef(null);
-  const overlayRef = useRef(null);
   const headlineRef = useRef(null);
   const line1Ref = useRef(null);
   const line2Ref = useRef(null);
@@ -20,118 +20,145 @@ export default function Hero({ onWatchVideo }) {
   const ctaRef = useRef(null);
   const underlineRef = useRef(null);
   const statsRef = useRef(null);
+  const [glitch, setGlitch] = useState(false);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // ── Ken Burns parallax on background ──
+      // Ken Burns slow breathe
       gsap.to(bgRef.current, {
-        scale: 1.12,
-        duration: 20,
+        scale: 1.08,
+        duration: 18,
         ease: "none",
         yoyo: true,
         repeat: -1,
       });
 
-      // ── Scroll parallax ──
+      // Scroll parallax
       gsap.to(bgRef.current, {
-        yPercent: 25,
+        yPercent: 20,
         ease: "none",
         scrollTrigger: {
           trigger: sectionRef.current,
           start: "top top",
           end: "bottom top",
-          scrub: 1.5,
+          scrub: 1.2,
         },
       });
 
-      // ── Headline letter reveal ──
+      // Character split reveal
       const letters1 = line1Ref.current?.querySelectorAll(".hero-char");
       const letters2 = line2Ref.current?.querySelectorAll(".hero-char");
 
       if (letters1?.length) {
-        gsap.set(letters1, { yPercent: 110, opacity: 0, skewX: -8 });
+        gsap.set(letters1, { yPercent: 110, opacity: 0, skewX: -10 });
         gsap.to(letters1, {
+          yPercent: 0,
+          opacity: 1,
+          skewX: 0,
+          duration: 0.9,
+          stagger: 0.035,
+          ease: "power4.out",
+          delay: 0.15,
+        });
+      }
+
+      if (letters2?.length) {
+        gsap.set(letters2, { yPercent: 110, opacity: 0, skewX: -10 });
+        gsap.to(letters2, {
           yPercent: 0,
           opacity: 1,
           skewX: 0,
           duration: 0.9,
           stagger: 0.03,
           ease: "power4.out",
-          delay: 0.1,
+          delay: 0.35,
         });
       }
 
-      if (letters2?.length) {
-        gsap.set(letters2, { yPercent: 110, opacity: 0, skewX: -8 });
-        gsap.to(letters2, {
-          yPercent: 0,
-          opacity: 1,
-          skewX: 0,
-          duration: 0.9,
-          stagger: 0.025,
-          ease: "power4.out",
-          delay: 0.3,
-        });
-      }
-
-      // ── Red underline draw ──
+      // Red brush underline drawing
       if (underlineRef.current) {
         const path = underlineRef.current;
-        const len = path.getTotalLength ? path.getTotalLength() : 300;
+        const len = path.getTotalLength ? path.getTotalLength() : 400;
         gsap.set(path, {
           strokeDasharray: len,
           strokeDashoffset: len,
         });
         gsap.to(path, {
           strokeDashoffset: 0,
-          duration: 1.2,
+          duration: 1.4,
           ease: "power2.out",
-          delay: 0.8,
+          delay: 0.85,
         });
       }
 
-      // ── Subheadline + CTA fade in ──
-      gsap.set([subRef.current, ctaRef.current], { opacity: 0, y: 24 });
+      // Subheadline + CTA buttons
+      gsap.set([subRef.current, ctaRef.current], { opacity: 0, y: 25 });
       gsap.to([subRef.current, ctaRef.current], {
         opacity: 1,
         y: 0,
         duration: 0.8,
         stagger: 0.15,
         ease: "power3.out",
-        delay: 1.0,
+        delay: 1.05,
       });
 
-      // ── Stats stagger ──
+      // Stats stagger
       const statEls = statsRef.current?.querySelectorAll(".stat-item");
       if (statEls?.length) {
-        gsap.set(statEls, { opacity: 0, x: 20 });
+        gsap.set(statEls, { opacity: 0, x: 25 });
         gsap.to(statEls, {
           opacity: 1,
           x: 0,
-          duration: 0.6,
+          duration: 0.65,
           stagger: 0.12,
           ease: "power3.out",
-          delay: 1.2,
+          delay: 1.25,
         });
       }
 
-      // ── Mouse parallax ──
+      // 3D Depth Mouse Parallax: background, headline, and foreground move at 3 distinct planes
       const handleMouseMove = (e) => {
         const { clientX, clientY } = e;
         const xPct = (clientX / window.innerWidth - 0.5) * 2;
         const yPct = (clientY / window.innerHeight - 0.5) * 2;
 
+        // Background plane (depth -25px)
         gsap.to(bgRef.current, {
-          x: xPct * -20,
-          y: yPct * -12,
-          duration: 1.5,
+          x: xPct * -25,
+          y: yPct * -15,
+          duration: 1.4,
           ease: "power2.out",
           overwrite: "auto",
         });
 
+        // Headline plane (depth +15px)
         gsap.to(headlineRef.current, {
+          x: xPct * 15,
+          y: yPct * 8,
+          duration: 1.1,
+          ease: "power2.out",
+          overwrite: "auto",
+        });
+
+        // Stats plane (depth +20px)
+        gsap.to(statsRef.current, {
           x: xPct * 10,
-          y: yPct * 6,
+          y: yPct * 5,
+          duration: 1.3,
+          ease: "power2.out",
+          overwrite: "auto",
+        });
+      };
+
+      // Device Gyro Tilt on Mobile
+      const handleOrientation = (e) => {
+        if (!e.gamma || !e.beta) return;
+        const xTilt = Math.min(Math.max(e.gamma, -30), 30) / 30;
+        const yTilt = Math.min(Math.max(e.beta - 45, -30), 30) / 30;
+
+        gsap.to(bgRef.current, {
+          x: xTilt * -15,
+          y: yTilt * -10,
           duration: 1.2,
           ease: "power2.out",
           overwrite: "auto",
@@ -140,23 +167,24 @@ export default function Hero({ onWatchVideo }) {
 
       const section = sectionRef.current;
       section?.addEventListener("mousemove", handleMouseMove);
-      return () => section?.removeEventListener("mousemove", handleMouseMove);
+      window.addEventListener("deviceorientation", handleOrientation);
+
+      return () => {
+        section?.removeEventListener("mousemove", handleMouseMove);
+        window.removeEventListener("deviceorientation", handleOrientation);
+      };
     }, sectionRef);
 
     return () => ctx.revert();
   }, []);
 
-  // Split text into individual chars with overflow hidden spans
   const splitChars = (text) => {
     return text.split("").map((char, i) => (
       <span
         key={i}
         style={{ display: "inline-block", overflow: "hidden", lineHeight: 0.95 }}
       >
-        <span
-          className="hero-char"
-          style={{ display: "inline-block" }}
-        >
+        <span className="hero-char" style={{ display: "inline-block" }}>
           {char === " " ? "\u00A0" : char}
         </span>
       </span>
@@ -170,57 +198,58 @@ export default function Hero({ onWatchVideo }) {
       style={{
         position: "relative",
         height: "100vh",
-        minHeight: "700px",
+        minHeight: "720px",
         overflow: "hidden",
         display: "flex",
         alignItems: "center",
       }}
       aria-label="Hero section"
     >
-      {/* Background image */}
+      {/* Layer 1: Background image with athlete & chalk explosion on right */}
       <div
         ref={bgRef}
         style={{
           position: "absolute",
-          inset: "-10%",
+          inset: "-8%",
           backgroundImage: `url(${images.hero.bg})`,
           backgroundSize: "cover",
-          backgroundPosition: "center 20%",
+          backgroundPosition: "center 25%",
           transformOrigin: "center center",
           willChange: "transform",
         }}
         role="img"
-        aria-label="Dark gym atmosphere with athlete"
+        aria-label="Dark gym atmosphere with athlete clapping chalk dust"
       />
 
-      {/* Dark vignette gradient */}
+      {/* Layer 2: Vignette Gradients (Dark left for high text readability) */}
       <div
         style={{
           position: "absolute",
           inset: 0,
-          background: "linear-gradient(to right, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.6) 55%, rgba(10,10,10,0.3) 75%, rgba(10,10,10,0.6) 100%)",
+          background:
+            "linear-gradient(to right, rgba(10,10,10,0.95) 0%, rgba(10,10,10,0.85) 35%, rgba(10,10,10,0.4) 65%, rgba(10,10,10,0.65) 100%)",
         }}
         aria-hidden="true"
       />
 
-      {/* Bottom fade */}
+      {/* Bottom fade into black */}
       <div
         style={{
           position: "absolute",
           bottom: 0,
           left: 0,
           right: 0,
-          height: "30%",
-          background: "linear-gradient(to top, #0A0A0A, transparent)",
+          height: "28%",
+          background: "linear-gradient(to top, #0A0A0A 0%, transparent 100%)",
           pointerEvents: "none",
         }}
         aria-hidden="true"
       />
 
-      {/* Chalk dust particles */}
+      {/* Layer 3: Interactive Chalk dust particles canvas */}
       <Particles />
 
-      {/* Content grid */}
+      {/* Layer 4: Main Content Grid (Headline + Vertical Stats) */}
       <div
         style={{
           position: "relative",
@@ -236,17 +265,24 @@ export default function Hero({ onWatchVideo }) {
           alignItems: "center",
         }}
       >
-        {/* Left: headline + CTA */}
-        <div ref={headlineRef} style={{ maxWidth: "720px" }}>
-          {/* BUILT DIFFERENT. */}
+        {/* Left: BUILT DIFFERENT. Headline & CTA */}
+        <div ref={headlineRef} style={{ maxWidth: "750px" }}>
+          {/* Main Giant Headline with glitch on hover */}
           <h1
+            onMouseEnter={() => setGlitch(true)}
+            onMouseLeave={() => setGlitch(false)}
             style={{
               fontFamily: "'Bebas Neue', sans-serif",
-              fontSize: "clamp(5rem, 12vw, 11rem)",
-              lineHeight: 0.9,
+              fontSize: "clamp(5.2rem, 12.5vw, 11.5rem)",
+              lineHeight: 0.88,
               letterSpacing: "-0.02em",
               color: "#EDEDED",
               margin: 0,
+              cursor: "none",
+              textShadow: glitch
+                ? "2px 0 #D62020, -2px 0 rgba(255,255,255,0.8)"
+                : "none",
+              transition: "text-shadow 0.15s ease",
             }}
           >
             <div
@@ -258,20 +294,24 @@ export default function Hero({ onWatchVideo }) {
             </div>
             <div
               ref={line2Ref}
-              style={{ display: "block", overflow: "hidden", position: "relative" }}
+              style={{
+                display: "block",
+                overflow: "hidden",
+                position: "relative",
+              }}
               aria-label="DIFFERENT."
             >
               {splitChars("DIFFERENT.")}
-              {/* Red underline SVG */}
+              {/* Dynamic Animated Brush Underline SVG */}
               <svg
-                viewBox="0 0 700 18"
+                viewBox="0 0 700 20"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
                 style={{
                   position: "absolute",
-                  bottom: "-8px",
+                  bottom: "-6px",
                   left: 0,
-                  width: "90%",
+                  width: "92%",
                   height: "auto",
                   overflow: "visible",
                 }}
@@ -279,9 +319,9 @@ export default function Hero({ onWatchVideo }) {
               >
                 <path
                   ref={underlineRef}
-                  d="M4 12 C60 6, 150 14, 220 8 C310 2, 400 16, 500 10 C580 5, 650 13, 696 9"
+                  d="M4 12 C70 5, 160 15, 240 8 C340 1, 440 17, 540 9 C620 4, 660 14, 696 10"
                   stroke="#D62020"
-                  strokeWidth="4"
+                  strokeWidth="4.5"
                   strokeLinecap="round"
                   fill="none"
                 />
@@ -289,12 +329,12 @@ export default function Hero({ onWatchVideo }) {
             </div>
           </h1>
 
-          {/* Subheadline */}
+          {/* Subheadline from screenshot */}
           <div ref={subRef} style={{ marginTop: "2.5rem" }}>
             <p
               style={{
                 fontFamily: "'Oswald', sans-serif",
-                fontSize: "clamp(0.9rem, 2vw, 1.2rem)",
+                fontSize: "clamp(0.95rem, 2vw, 1.25rem)",
                 letterSpacing: "0.15em",
                 color: "#EDEDED",
                 marginBottom: "0.3rem",
@@ -305,7 +345,7 @@ export default function Hero({ onWatchVideo }) {
             <p
               style={{
                 fontFamily: "'Oswald', sans-serif",
-                fontSize: "clamp(0.9rem, 2vw, 1.2rem)",
+                fontSize: "clamp(0.95rem, 2vw, 1.25rem)",
                 letterSpacing: "0.15em",
                 color: "#D62020",
                 marginBottom: "0",
@@ -315,7 +355,7 @@ export default function Hero({ onWatchVideo }) {
             </p>
           </div>
 
-          {/* CTA row */}
+          {/* CTA Row */}
           <div
             ref={ctaRef}
             style={{
@@ -326,28 +366,21 @@ export default function Hero({ onWatchVideo }) {
               flexWrap: "wrap",
             }}
           >
-            {/* Primary CTA */}
-            <a
-              href="#training"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById("training")?.scrollIntoView({ behavior: "smooth" });
-              }}
+            <Link
+              to="/training"
               style={{
                 fontFamily: "'Oswald', sans-serif",
                 fontSize: "0.85rem",
                 letterSpacing: "0.18em",
                 color: "#EDEDED",
                 background: "#D62020",
-                padding: "0.9rem 2rem",
+                padding: "0.95rem 2.2rem",
                 display: "flex",
                 alignItems: "center",
                 gap: "0.5rem",
                 textDecoration: "none",
                 borderRadius: "2px",
                 transition: "background 0.3s, transform 0.3s",
-                position: "relative",
-                overflow: "hidden",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = "#FF2D2D";
@@ -360,11 +393,12 @@ export default function Hero({ onWatchVideo }) {
             >
               {brand.cta}
               <ArrowUpRight size={16} />
-            </a>
+            </Link>
 
-            {/* Watch Video */}
+            {/* Watch Video Modal Trigger */}
             <button
               onClick={onWatchVideo}
+              data-cursor="PLAY"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -381,7 +415,7 @@ export default function Hero({ onWatchVideo }) {
               }}
               onMouseEnter={(e) => (e.currentTarget.style.color = "#D62020")}
               onMouseLeave={(e) => (e.currentTarget.style.color = "#EDEDED")}
-              aria-label="Watch promotional video"
+              aria-label="Watch promotional training video"
             >
               <span
                 style={{
@@ -402,7 +436,7 @@ export default function Hero({ onWatchVideo }) {
           </div>
         </div>
 
-        {/* Right: Stats column */}
+        {/* Right: Vertical Stats Column */}
         <div
           ref={statsRef}
           style={{
@@ -419,11 +453,10 @@ export default function Hero({ onWatchVideo }) {
       </div>
 
       <style>{`
-        @media (max-width: 767px) {
+        @media (max-width: 899px) {
           .hero-stats { display: none !important; }
         }
       `}</style>
     </section>
   );
 }
-

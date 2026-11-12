@@ -1,7 +1,8 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { ArrowUpRight, Mail, Phone, MapPin, Clock } from "lucide-react";
 import IronLogo from "./IronLogo";
-import { footer, navLinks, brand } from "../data/content";
+import { footer } from "../data/content";
 
 export default function Footer() {
   const [email, setEmail] = useState("");
@@ -13,6 +14,7 @@ export default function Footer() {
     if (email) {
       setSubmitted(true);
       setEmail("");
+      setTimeout(() => setSubmitted(false), 5000);
     }
   };
 
@@ -88,7 +90,7 @@ export default function Footer() {
                 color: "#8A8A8A",
               }}
             >
-              Training tips, member stories, and exclusive offers — straight to your inbox.
+              Training tips, member PR highlights, and open combine announcements.
             </p>
           </div>
 
@@ -209,7 +211,7 @@ export default function Footer() {
           {/* Socials */}
           <div style={{ display: "flex", gap: "0.75rem" }}>
             {footer.socials.map((s) => {
-              const Icon = socialIcons[s.name] || Instagram;
+              const Icon = socialIcons[s.name] || socialIcons.Instagram;
               return (
                 <a
                   key={s.name}
@@ -240,7 +242,7 @@ export default function Footer() {
                     e.currentTarget.style.background = "transparent";
                   }}
                 >
-                  <Icon size={15} />
+                  <Icon />
                 </a>
               );
             })}
@@ -259,13 +261,13 @@ export default function Footer() {
               textTransform: "uppercase",
             }}
           >
-            QUICK LINKS
+            NAVIGATION
           </h3>
           <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "0.75rem" }}>
             {footer.quickLinks.map((l) => (
               <li key={l.href}>
-                <a
-                  href={l.href}
+                <Link
+                  to={l.href}
                   style={{
                     fontFamily: "'Inter', sans-serif",
                     fontSize: "0.85rem",
@@ -281,7 +283,7 @@ export default function Footer() {
                 >
                   <span style={{ color: "#D62020", fontSize: "0.6rem" }}>▶</span>
                   {l.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
@@ -299,7 +301,7 @@ export default function Footer() {
               textTransform: "uppercase",
             }}
           >
-            HOURS
+            FACILITY HOURS
           </h3>
           <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "1rem" }}>
             {footer.hours.map((h) => (
@@ -417,7 +419,7 @@ export default function Footer() {
               color: "#8A8A8A",
             }}
           >
-            Privacy Policy · Terms of Service
+            Privacy Policy · Terms of Service · Safety Standards
           </p>
         </div>
       </div>

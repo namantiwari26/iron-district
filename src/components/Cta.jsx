@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowUpRight } from "lucide-react";
@@ -7,7 +8,12 @@ import { images } from "../data/images";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const AVATAR_COLORS = ["#D62020", "#8A8A8A", "#1A1A1A", "#D62020"];
+const avatarList = [
+  images.avatars.a1,
+  images.avatars.a2,
+  images.avatars.a3,
+  images.avatars.a4,
+];
 
 export default function Cta() {
   const sectionRef = useRef(null);
@@ -25,13 +31,13 @@ export default function Cta() {
     const ctx = gsap.context(() => {
       // Parallax background
       gsap.to(bgRef.current, {
-        yPercent: 20,
+        yPercent: 15,
         ease: "none",
         scrollTrigger: {
           trigger: sectionRef.current,
           start: "top bottom",
           end: "bottom top",
-          scrub: 2,
+          scrub: 1.5,
         },
       });
 
@@ -42,7 +48,7 @@ export default function Cta() {
         headline3Ref.current,
       ].filter(Boolean);
 
-      gsap.set(lines, { opacity: 0, y: 60, skewX: -5 });
+      gsap.set(lines, { opacity: 0, y: 50, skewX: -6 });
       ScrollTrigger.create({
         trigger: sectionRef.current,
         start: "top 70%",
@@ -64,7 +70,7 @@ export default function Cta() {
               x: 0,
               duration: 0.8,
               ease: "power3.out",
-              delay: 0.5,
+              delay: 0.45,
             });
           }
 
@@ -76,29 +82,31 @@ export default function Cta() {
             duration: 0.7,
             stagger: 0.15,
             ease: "power3.out",
-            delay: 0.7,
+            delay: 0.65,
           });
 
-          // Graffiti glow pulse
+          // Graffiti text fade in
           if (graffitiRef.current) {
-            gsap.set(graffitiRef.current, { opacity: 0 });
+            gsap.set(graffitiRef.current, { opacity: 0, scale: 0.95 });
             gsap.to(graffitiRef.current, {
               opacity: 1,
-              duration: 0.5,
-              delay: 0.9,
+              scale: 1,
+              duration: 0.7,
+              ease: "power2.out",
+              delay: 0.85,
             });
           }
 
-          // Neon flicker
+          // Neon flicker-on sequence
           if (neonRef.current) {
-            const tl = gsap.timeline({ delay: 0.3 });
-            tl.to(neonRef.current, { opacity: 0.3, duration: 0.08 })
-              .to(neonRef.current, { opacity: 1, duration: 0.08 })
-              .to(neonRef.current, { opacity: 0.5, duration: 0.1 })
-              .to(neonRef.current, { opacity: 1, duration: 0.3 })
+            const tl = gsap.timeline({ delay: 0.2 });
+            tl.to(neonRef.current, { opacity: 0.2, duration: 0.06 })
+              .to(neonRef.current, { opacity: 0.9, duration: 0.08 })
+              .to(neonRef.current, { opacity: 0.3, duration: 0.08 })
+              .to(neonRef.current, { opacity: 1, duration: 0.2 })
               .to(neonRef.current, {
-                opacity: 0.9,
-                duration: 2,
+                opacity: 0.85,
+                duration: 2.2,
                 yoyo: true,
                 repeat: -1,
                 ease: "sine.inOut",
@@ -125,45 +133,46 @@ export default function Cta() {
       }}
       aria-labelledby="cta-heading"
     >
-      {/* Background */}
+      {/* Background Image: Athlete walking away holding gym bag */}
       <div
         ref={bgRef}
         style={{
           position: "absolute",
-          inset: "-15%",
+          inset: "-12%",
           backgroundImage: `url(${images.cta.bg})`,
           backgroundSize: "cover",
-          backgroundPosition: "center",
+          backgroundPosition: "center 30%",
           willChange: "transform",
         }}
         role="img"
-        aria-label="Athlete in dark gym with neon light"
+        aria-label="Muscular athlete walking away holding a gym bag with overhead neon light rectangle"
       />
 
-      {/* Dark overlay */}
+      {/* Dark Vignette Overlay */}
       <div
         style={{
           position: "absolute",
           inset: 0,
-          background: "linear-gradient(to right, rgba(10,10,10,0.95) 0%, rgba(10,10,10,0.75) 55%, rgba(10,10,10,0.5) 100%)",
+          background:
+            "linear-gradient(to right, rgba(10,10,10,0.96) 0%, rgba(10,10,10,0.85) 45%, rgba(10,10,10,0.4) 75%, rgba(10,10,10,0.7) 100%)",
         }}
         aria-hidden="true"
       />
 
-      {/* Neon rectangle light outline at top */}
+      {/* Top Ceiling Neon Rectangle Light Outline from Screenshot */}
       <div
         ref={neonRef}
         style={{
           position: "absolute",
-          top: "8%",
-          left: "50%",
+          top: "6%",
+          left: "58%",
           transform: "translateX(-50%)",
-          width: "clamp(200px, 40%, 450px)",
-          height: "clamp(60px, 10%, 100px)",
-          border: "1.5px solid rgba(255,255,255,0.7)",
+          width: "clamp(220px, 35vw, 480px)",
+          height: "clamp(55px, 8vw, 95px)",
+          border: "2px solid rgba(255, 255, 255, 0.85)",
           borderRadius: "2px",
           boxShadow:
-            "0 0 15px rgba(255,255,255,0.3), 0 0 30px rgba(255,255,255,0.1), inset 0 0 15px rgba(255,255,255,0.05)",
+            "0 0 15px rgba(255,255,255,0.6), 0 0 35px rgba(255,255,255,0.25), inset 0 0 15px rgba(255,255,255,0.15)",
           pointerEvents: "none",
         }}
         aria-hidden="true"
@@ -178,20 +187,20 @@ export default function Cta() {
           maxWidth: "1440px",
           margin: "0 auto",
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
+          gridTemplateColumns: "1.2fr 1fr",
           gap: "4rem",
           alignItems: "end",
         }}
         className="cta-grid"
       >
-        {/* Left: headline */}
+        {/* Left: Stacked Headline + CTA */}
         <div>
           <h2
             id="cta-heading"
             style={{
               fontFamily: "'Bebas Neue', sans-serif",
-              fontSize: "clamp(4rem, 11vw, 10rem)",
-              lineHeight: 0.9,
+              fontSize: "clamp(4.2rem, 11vw, 10.5rem)",
+              lineHeight: 0.88,
               letterSpacing: "-0.01em",
               margin: 0,
             }}
@@ -216,15 +225,19 @@ export default function Cta() {
             </span>
           </h2>
 
-          {/* Handwritten "Starts here." */}
+          {/* Handwritten "Starts here." with brush underline */}
           <div
             ref={handwrittenRef}
-            style={{ marginTop: "1rem", position: "relative", display: "inline-block" }}
+            style={{
+              marginTop: "1rem",
+              position: "relative",
+              display: "inline-block",
+            }}
           >
             <span
               style={{
                 fontFamily: "'Permanent Marker', cursive",
-                fontSize: "clamp(1.8rem, 4vw, 3rem)",
+                fontSize: "clamp(1.9rem, 4vw, 3.2rem)",
                 color: "#D62020",
                 display: "block",
                 lineHeight: 1.1,
@@ -232,41 +245,37 @@ export default function Cta() {
             >
               {cta.handwritten}
             </span>
-            {/* Brush underline SVG */}
+            {/* Brush Underline SVG */}
             <svg
-              viewBox="0 0 300 12"
+              viewBox="0 0 320 14"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               style={{ width: "100%", display: "block", marginTop: "-4px" }}
               aria-hidden="true"
             >
               <path
-                d="M4 8 C40 4, 90 10, 150 6 C200 3, 250 9, 296 7"
+                d="M4 9 C50 4, 110 11, 170 6 C230 2, 280 10, 316 7"
                 stroke="#D62020"
-                strokeWidth="3"
+                strokeWidth="3.5"
                 strokeLinecap="round"
                 fill="none"
-                opacity="0.7"
+                opacity="0.85"
               />
             </svg>
           </div>
 
           {/* CTA Button */}
-          <div style={{ marginTop: "2.5rem" }}>
-            <a
+          <div style={{ marginTop: "2.75rem" }}>
+            <Link
               ref={ctaBtnRef}
-              href="#pricing"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" });
-              }}
+              to="/contact"
               style={{
                 fontFamily: "'Oswald', sans-serif",
                 fontSize: "0.85rem",
                 letterSpacing: "0.18em",
                 color: "#EDEDED",
                 background: "#D62020",
-                padding: "1rem 2.5rem",
+                padding: "1rem 2.6rem",
                 display: "inline-flex",
                 alignItems: "center",
                 gap: "0.5rem",
@@ -285,76 +294,69 @@ export default function Cta() {
             >
               {cta.cta}
               <ArrowUpRight size={16} />
-            </a>
+            </Link>
           </div>
 
-          {/* Avatars row */}
+          {/* Avatars Stack */}
           <div
             ref={avatarsRef}
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "1rem",
-              marginTop: "2rem",
+              gap: "1.2rem",
+              marginTop: "2.2rem",
             }}
           >
-            {/* Avatar stack */}
+            {/* Overlapping Avatars */}
             <div style={{ display: "flex" }}>
-              {AVATAR_COLORS.map((color, i) => (
-                <div
+              {avatarList.map((src, i) => (
+                <img
                   key={i}
+                  src={src}
+                  alt={`Member ${i + 1}`}
                   style={{
-                    width: "36px",
-                    height: "36px",
+                    width: "38px",
+                    height: "38px",
                     borderRadius: "50%",
                     border: "2px solid #0A0A0A",
                     marginLeft: i === 0 ? 0 : "-10px",
-                    background: color,
-                    overflow: "hidden",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "0.7rem",
-                    fontFamily: "'Bebas Neue', sans-serif",
-                    color: "#EDEDED",
+                    objectFit: "cover",
                     flexShrink: 0,
+                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.6)",
                   }}
-                >
-                  {i + 1}
-                </div>
+                />
               ))}
             </div>
 
-            <div>
-              <p
-                style={{
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: "0.75rem",
-                  color: "#EDEDED",
-                  lineHeight: 1.4,
-                }}
-              >
-                {cta.memberText}
-              </p>
-            </div>
+            <p
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontSize: "0.82rem",
+                color: "#EDEDED",
+                margin: 0,
+                lineHeight: 1.4,
+              }}
+            >
+              {cta.memberText}
+            </p>
           </div>
         </div>
 
-        {/* Right: Graffiti text */}
+        {/* Right: "BE YOUR OWN STANDARD." Graffiti Text */}
         <div
           ref={graffitiRef}
-          style={{ textAlign: "right" }}
+          style={{ textAlign: "right", paddingBottom: "1.5rem" }}
           aria-hidden="true"
         >
           <div
             className="neon-text"
             style={{
               fontFamily: "'Permanent Marker', cursive",
-              fontSize: "clamp(2rem, 5vw, 4rem)",
-              lineHeight: 1.15,
+              fontSize: "clamp(2.4rem, 5.5vw, 4.4rem)",
+              lineHeight: 1.1,
               color: "#D62020",
               textShadow:
-                "0 0 20px rgba(214,32,32,0.6), 0 0 40px rgba(214,32,32,0.3)",
+                "0 0 15px rgba(214,32,32,0.8), 0 0 35px rgba(214,32,32,0.4), 0 0 60px rgba(214,32,32,0.2)",
               transform: "rotate(-3deg)",
               display: "inline-block",
             }}
@@ -373,14 +375,13 @@ export default function Cta() {
       </div>
 
       <style>{`
-        @media (max-width: 767px) {
+        @media (max-width: 859px) {
           .cta-grid {
             grid-template-columns: 1fr !important;
-            gap: 2rem !important;
+            gap: 2.5rem !important;
           }
         }
       `}</style>
     </section>
   );
 }
-
